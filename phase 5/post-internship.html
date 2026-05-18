@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Internship — InternHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+  <style>
+    body{display:flex}
+    .content-area{margin-left:250px;flex:1;min-height:100vh;background:var(--bg-primary)}
+    .topbar{background:rgba(13,17,23,0.95);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+    .form-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.5rem}
+    .form-section-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem}
+    .form-section-title i{color:var(--accent)}
+    .skill-tag-input{display:flex;flex-wrap:wrap;gap:0.4rem;background:var(--bg-secondary);border:1.5px solid var(--border);border-radius:var(--radius);padding:0.6rem 1rem;cursor:text;min-height:46px;align-items:center}
+    .skill-tag-input:focus-within{border-color:var(--accent)}
+    .skill-chip{background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.3);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.82rem;font-weight:600;display:flex;align-items:center;gap:0.3rem}
+    .skill-chip button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:0.8rem;padding:0;line-height:1}
+    .skill-chip button:hover{color:#ef4444}
+    .skill-tag-input input{background:transparent;border:none;outline:none;color:var(--text-primary);font-size:0.88rem;flex:1;min-width:100px}
+    .skill-tag-input input::placeholder{color:var(--text-muted)}
+    .preview-card{background:var(--bg-card);border:1.5px solid rgba(0,212,170,0.25);border-radius:var(--radius-lg);padding:1.5rem;position:sticky;top:80px}
+    @media(max-width:768px){body{flex-direction:column}.content-area{margin-left:0}}
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">Intern<span style="color:var(--text-primary);">Hub</span></div>
+  <a href="recruiter-dashboard.html" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <a href="post-internship.html" class="sidebar-link active"><i class="bi bi-plus-circle"></i> Post Internship</a>
+  <a href="#" class="sidebar-link"><i class="bi bi-briefcase"></i> My Postings</a>
+  <a href="#" class="sidebar-link"><i class="bi bi-people"></i> Candidates</a>
+  <div style="position:absolute;bottom:1.5rem;left:1rem;right:1rem;">
+    <a href="#" id="logoutBtn" class="sidebar-link" style="color:#f87171;border:1px solid rgba(239,68,68,0.2);background:rgba(239,68,68,0.05);"><i class="bi bi-box-arrow-left"></i> Logout</a>
+  </div>
+</div>
+
+<div class="content-area">
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-2">
+      <a href="recruiter-dashboard.html" style="color:var(--text-muted);text-decoration:none;font-size:0.88rem;">Dashboard</a>
+      <i class="bi bi-chevron-right" style="font-size:0.75rem;color:var(--text-muted);"></i>
+      <span style="font-size:0.88rem;font-weight:600;">Post Internship</span>
+    </div>
+  </div>
+
+  <div class="p-4">
+    <div class="mb-4">
+      <h4 style="font-weight:800;margin-bottom:0.2rem;">Post a New <span style="color:var(--accent);">Internship</span></h4>
+      <p class="muted-text" style="font-size:0.88rem;">Fill in the details to attract the right candidates.</p>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:0.75rem 1rem;margin-bottom:1.5rem;color:#f87171;font-size:0.88rem;"></div>
+
+    <div class="row g-4">
+      <!-- FORM -->
+      <div class="col-lg-8">
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-info-circle-fill"></i> Basic Information</div>
+          <div class="mb-3">
+            <label class="form-label-dark">Internship Title *</label>
+            <input type="text" id="title" class="form-control form-control-dark" placeholder="e.g. Frontend Developer Intern" oninput="updatePreview()" />
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label-dark">Category *</label>
+              <select id="category" class="form-control form-control-dark">
+                <option value="">Select Category</option>
+                <option>Web Development</option>
+                <option>Data Science / ML</option>
+                <option>UI/UX Design</option>
+                <option>Mobile Development</option>
+                <option>Marketing</option>
+                <option>Finance</option>
+                <option>Content Writing</option>
+                <option>Business Development</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-dark">Number of Openings</label>
+              <input type="number" id="numberOfOpenings" class="form-control form-control-dark" placeholder="e.g. 3" min="1" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-briefcase-fill"></i> Work Details</div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label-dark">Work Type *</label>
+              <select id="workType" class="form-control form-control-dark" onchange="updatePreview()">
+                <option>Remote</option><option>In-Office</option><option>Hybrid</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-dark">Location</label>
+              <input type="text" id="location" class="form-control form-control-dark" placeholder="e.g. Bangalore" oninput="updatePreview()" />
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label-dark">Duration *</label>
+              <select id="duration" class="form-control form-control-dark" onchange="updatePreview()">
+                <option>1 Month</option><option>2 Months</option><option selected>3 Months</option><option>6 Months</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-dark">Start Date</label>
+              <input type="date" id="startDate" class="form-control form-control-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-currency-rupee"></i> Stipend</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label-dark">Stipend Type</label>
+              <select id="stipendType" class="form-control form-control-dark" onchange="toggleStipend()">
+                <option value="Paid">Paid</option>
+                <option value="Unpaid">Unpaid</option>
+                <option value="Performance Based">Performance Based</option>
+              </select>
+            </div>
+            <div class="col-md-6" id="stipendAmountWrap">
+              <label class="form-label-dark">Monthly Stipend (₹)</label>
+              <input type="number" id="stipendAmount" class="form-control form-control-dark" placeholder="e.g. 20000" oninput="updatePreview()" />
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="d-flex align-items-center gap-2">
+              <input type="checkbox" id="ppoCheck" style="accent-color:var(--accent);" />
+              <label for="ppoCheck" style="font-size:0.88rem;color:var(--text-muted);cursor:pointer;">Pre-Placement Offer (PPO) possible</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-tags-fill"></i> Required Skills</div>
+          <label class="form-label-dark mb-2">Add Skills (press Enter to add)</label>
+          <div class="skill-tag-input" id="skillTagWrap" onclick="document.getElementById('skillInput').focus()">
+            <input type="text" id="skillInput" placeholder="Type a skill and press Enter..." onkeydown="addSkill(event)" />
+          </div>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;">Suggested: JavaScript, Python, React, Node.js, Figma</div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-file-text-fill"></i> Description</div>
+          <div class="mb-3">
+            <label class="form-label-dark">About the Role *</label>
+            <textarea id="description" class="form-control form-control-dark" rows="4" placeholder="Describe what the intern will work on..."></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label-dark">Responsibilities</label>
+            <textarea id="responsibilities" class="form-control form-control-dark" rows="3" placeholder="List key responsibilities..."></textarea>
+          </div>
+          <div>
+            <label class="form-label-dark">Who Can Apply</label>
+            <textarea id="whoCanApply" class="form-control form-control-dark" rows="2" placeholder="Eligibility criteria..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-calendar-event-fill"></i> Application Details</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label-dark">Application Deadline</label>
+              <input type="date" id="deadline" class="form-control form-control-dark" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-dark">Interview Process</label>
+              <select id="interviewProcess" class="form-control form-control-dark">
+                <option>Direct Offer (No Interview)</option>
+                <option>One Round</option>
+                <option>Two Rounds</option>
+                <option>Three+ Rounds</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3">
+          <button class="btn btn-outline-accent px-4" onclick="saveDraft()">Save as Draft</button>
+          <button class="btn btn-accent px-5" id="publishBtn" onclick="publishInternship()">
+            <i class="bi bi-rocket-takeoff me-2"></i>Publish Internship
+          </button>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="col-lg-4">
+        <div class="preview-card">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;margin-bottom:1rem;">Live Preview</div>
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div style="width:44px;height:44px;border-radius:12px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:#a78bfa;flex-shrink:0;" id="previewLogo">?</div>
+            <div>
+              <div style="font-weight:700;font-size:0.95rem;" id="previewTitle">Internship Title</div>
+              <div class="muted-text" style="font-size:0.8rem;" id="previewCompany">Your Company · Location</div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge-teal" id="previewType">Remote</span>
+            <span class="badge-purple" id="previewDuration">3 Months</span>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <div>
+              <div class="muted-text" style="font-size:0.75rem;">Stipend</div>
+              <div style="font-weight:700;font-size:0.9rem;color:var(--accent);" id="previewStipend">₹ —/mo</div>
+            </div>
+          </div>
+          <div id="previewSkills" class="d-flex flex-wrap gap-1 mb-3"></div>
+          <div style="font-size:0.78rem;color:var(--text-muted);padding:0.75rem;background:var(--bg-secondary);border-radius:8px;">
+            <i class="bi bi-eye me-1"></i> Preview updates as you type
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+  
+  document.getElementById('logoutBtn').onclick = () => Auth.logout();
+
+  // Set preview company name from logged in user
+  const user = Auth.getUser();
+  if (user) {
+    document.getElementById('previewCompany').textContent = (user.companyName || 'Your Company') + ' · Location';
+    document.getElementById('previewLogo').textContent = (user.companyName || 'C').charAt(0).toUpperCase();
+  }
+
+  let skills = [];
+
+  function addSkill(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = document.getElementById('skillInput').value.trim();
+      if (val && !skills.includes(val)) { skills.push(val); renderSkills(); updatePreview(); }
+      document.getElementById('skillInput').value = '';
+    }
+  }
+
+  function renderSkills() {
+    const wrap = document.getElementById('skillTagWrap');
+    const input = document.getElementById('skillInput');
+    wrap.innerHTML = '';
+    skills.forEach((s, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'skill-chip';
+      chip.innerHTML = `${s} <button onclick="removeSkill(${i})">×</button>`;
+      wrap.appendChild(chip);
+    });
+    wrap.appendChild(input);
+  }
+
+  function removeSkill(i) { skills.splice(i, 1); renderSkills(); updatePreview(); }
+
+  function toggleStipend() {
+    document.getElementById('stipendAmountWrap').style.display =
+      document.getElementById('stipendType').value === 'Paid' ? 'block' : 'none';
+  }
+
+  function updatePreview() {
+    const title    = document.getElementById('title').value || 'Internship Title';
+    const location = document.getElementById('location').value || 'Location';
+    const company  = user?.companyName || 'Your Company';
+    document.getElementById('previewTitle').textContent    = title;
+    document.getElementById('previewCompany').textContent  = `${company} · ${location}`;
+    document.getElementById('previewLogo').textContent     = company.charAt(0).toUpperCase();
+    document.getElementById('previewType').textContent     = document.getElementById('workType').value;
+    document.getElementById('previewDuration').textContent = document.getElementById('duration').value;
+    const amt = document.getElementById('stipendAmount').value;
+    document.getElementById('previewStipend').textContent  = amt ? `₹${Number(amt).toLocaleString('en-IN')}/mo` : '₹ —/mo';
+    document.getElementById('previewSkills').innerHTML     = skills.map(s=>`<span class="tag" style="font-size:0.78rem;">${s}</span>`).join('');
+  }
+
+  function buildPayload() {
+    return {
+      title:             document.getElementById('title').value.trim(),
+      category:          document.getElementById('category').value,
+      workType:          document.getElementById('workType').value,
+      location:          document.getElementById('location').value.trim() || 'Remote',
+      duration:          document.getElementById('duration').value,
+      startDate:         document.getElementById('startDate').value || undefined,
+      applicationDeadline: document.getElementById('deadline').value || undefined,
+      stipend: {
+        type:   document.getElementById('stipendType').value,
+        amount: Number(document.getElementById('stipendAmount').value) || 0,
+      },
+      skills,
+      description:      document.getElementById('description').value.trim(),
+      responsibilities: document.getElementById('responsibilities').value.trim(),
+      whoCanApply:      document.getElementById('whoCanApply').value.trim(),
+      numberOfOpenings: Number(document.getElementById('numberOfOpenings').value) || 1,
+      ppoAvailable:     document.getElementById('ppoCheck').checked,
+      interviewProcess: document.getElementById('interviewProcess').value,
+    };
+  }
+
+  async function publishInternship() {
+    const banner = document.getElementById('errorBanner');
+    banner.style.display = 'none';
+
+    const payload = buildPayload();
+    if (!payload.title)       { banner.textContent = 'Please enter the internship title.'; banner.style.display='block'; return; }
+    if (!payload.category)    { banner.textContent = 'Please select a category.'; banner.style.display='block'; return; }
+    if (!payload.description) { banner.textContent = 'Please add a description.'; banner.style.display='block'; return; }
+
+    const btn = document.getElementById('publishBtn');
+    UI.setLoading(btn, true);
+    const result = await InternshipAPI.create(payload);
+    UI.setLoading(btn, false);
+
+    if (!result.success) { banner.textContent = result.error; banner.style.display='block'; return; }
+
+    UI.showToast('🚀 Internship published successfully!');
+    setTimeout(() => window.location.href = 'recruiter-dashboard.html', 1200);
+  }
+
+  function saveDraft() { UI.showToast('Draft saved! (Connect storage to persist)', 'info'); }
+</script>
+</body>
+</html>

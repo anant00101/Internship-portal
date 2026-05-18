@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — InternHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+  <style>
+    body { min-height:100vh; display:flex; flex-direction:column; }
+    .auth-wrapper { flex:1; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; position:relative; overflow:hidden; }
+    .auth-wrapper::before { content:''; position:absolute; top:-150px; left:-150px; width:400px; height:400px; background:radial-gradient(circle,rgba(0,212,170,0.08) 0%,transparent 70%); }
+    .auth-wrapper::after { content:''; position:absolute; bottom:-150px; right:-100px; width:400px; height:400px; background:radial-gradient(circle,rgba(124,58,237,0.08) 0%,transparent 70%); }
+    .auth-card { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:2.5rem; width:100%; max-width:440px; position:relative; z-index:1; }
+    .auth-logo { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.6rem; color:var(--accent); text-decoration:none; display:block; margin-bottom:2rem; text-align:center; }
+    .auth-logo span { color:var(--text-primary); }
+    .role-tab { flex:1; padding:0.6rem; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); border-radius:10px; font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:0.88rem; cursor:pointer; transition:all 0.2s; }
+    .role-tab.active { background:rgba(0,212,170,0.1); border-color:rgba(0,212,170,0.4); color:var(--accent); }
+    .divider-text { position:relative; text-align:center; margin:1.25rem 0; }
+    .divider-text::before { content:''; position:absolute; top:50%; left:0; width:100%; height:1px; background:var(--border); }
+    .divider-text span { position:relative; background:var(--bg-card); padding:0 0.75rem; color:var(--text-muted); font-size:0.82rem; }
+    .password-wrap { position:relative; }
+    .toggle-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--text-muted); background:none; border:none; }
+    .toggle-eye:hover { color:var(--accent); }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Intern<span>Hub</span></a>
+    <div class="d-flex gap-2 ms-auto">
+      <a href="register.html" class="btn btn-accent btn-sm">Sign Up Free</a>
+    </div>
+  </div>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="auth-card fade-up">
+    <a href="index.html" class="auth-logo">Intern<span>Hub</span></a>
+    <h4 style="font-weight:800;text-align:center;margin-bottom:0.4rem;">Welcome back</h4>
+    <p class="muted-text text-center mb-4" style="font-size:0.88rem;">Sign in to continue your journey</p>
+
+    <div class="d-flex gap-2 mb-4">
+      <button class="role-tab active" onclick="setRole(this,'student')"><i class="bi bi-mortarboard me-1"></i> Student</button>
+      <button class="role-tab" onclick="setRole(this,'recruiter')"><i class="bi bi-building me-1"></i> Recruiter</button>
+    </div>
+
+    <div id="errorBanner" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;color:#f87171;font-size:0.88rem;"></div>
+
+    <div class="divider-text"><span>sign in with email</span></div>
+
+    <div class="mb-3 mt-3">
+      <label class="form-label-dark">Email Address</label>
+      <input type="email" id="email" class="form-control form-control-dark" placeholder="you@example.com" />
+    </div>
+    <div class="mb-2">
+      <label class="form-label-dark">Password</label>
+      <div class="password-wrap">
+        <input type="password" id="password" class="form-control form-control-dark" placeholder="••••••••" />
+        <button class="toggle-eye" onclick="togglePassword()"><i class="bi bi-eye" id="eyeIcon"></i></button>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+      <a href="#" style="font-size:0.83rem;color:var(--accent);text-decoration:none;">Forgot password?</a>
+    </div>
+
+    <button class="btn btn-accent w-100 py-2 mb-3" id="loginBtn" onclick="handleLogin()">
+      Sign In as Student <i class="bi bi-arrow-right ms-1"></i>
+    </button>
+    <p class="text-center muted-text" style="font-size:0.87rem;">
+      Don't have an account? <a href="register.html" style="color:var(--accent);text-decoration:none;font-weight:600;">Sign Up Free</a>
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+  let currentRole = 'student';
+
+  if (Auth.isLoggedIn()) {
+    const u = Auth.getUser();
+    window.location.href = u?.role === 'recruiter' ? 'recruiter-dashboard.html' : 'student-dashboard.html';
+  }
+
+  function setRole(btn, role) {
+    currentRole = role;
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('loginBtn').innerHTML = `Sign In as ${role === 'student' ? 'Student' : 'Recruiter'} <i class="bi bi-arrow-right ms-1"></i>`;
+  }
+
+  function togglePassword() {
+    const inp = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    icon.className = inp.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+  }
+
+  async function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('loginBtn');
+    const banner = document.getElementById('errorBanner');
+    banner.style.display = 'none';
+
+    if (!email || !password) { banner.textContent = 'Please enter your email and password.'; banner.style.display = 'block'; return; }
+
+    UI.setLoading(btn, true);
+    const result = await AuthAPI.login(email, password);
+    UI.setLoading(btn, false);
+
+    if (!result.success) { banner.textContent = result.error; banner.style.display = 'block'; return; }
+
+    const { accessToken, refreshToken, user } = result.data;
+    if (user.role !== currentRole) {
+      banner.textContent = `This account is a ${user.role} account. Please select the correct role tab.`;
+      banner.style.display = 'block'; return;
+    }
+
+    Auth.saveSession(accessToken, refreshToken, user);
+    UI.showToast(`Welcome back, ${user.firstName}! 👋`);
+    setTimeout(() => { window.location.href = user.role === 'recruiter' ? 'recruiter-dashboard.html' : 'student-dashboard.html'; }, 800);
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+</body>
+</html>

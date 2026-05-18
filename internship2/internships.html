@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Internships — InternHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+  <style>
+    .filter-sidebar { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem; position:sticky; top:80px; }
+    .filter-check { display:flex; align-items:center; gap:0.5rem; padding:0.3rem 0; cursor:pointer; }
+    .filter-check input { accent-color:var(--accent); }
+    .filter-check span { font-size:0.88rem; color:var(--text-muted); }
+    .filter-check:hover span { color:var(--text-primary); }
+    .internship-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem; transition:all 0.25s; color:inherit; margin-bottom:0.75rem; }
+    .internship-card:hover { border-color:rgba(0,212,170,0.35); transform:translateY(-3px); box-shadow:0 12px 35px rgba(0,0,0,0.4); }
+    .company-avatar { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1rem; flex-shrink:0; }
+    .saved-btn { background:transparent; border:1.5px solid var(--border); color:var(--text-muted); border-radius:8px; padding:0.3rem 0.6rem; cursor:pointer; transition:all 0.2s; font-size:1rem; }
+    .saved-btn:hover, .saved-btn.saved { border-color:rgba(251,146,60,0.5); color:#fb923c; }
+    .skeleton { background:linear-gradient(90deg,var(--bg-card) 25%,var(--bg-secondary) 50%,var(--bg-card) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:var(--radius); }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .sort-select { background:var(--bg-secondary); border:1.5px solid var(--border); color:var(--text-primary); border-radius:var(--radius); padding:0.65rem 1rem; font-family:'DM Sans',sans-serif; cursor:pointer; }
+    .sort-select:focus { outline:none; border-color:var(--accent); }
+    .sort-select option { background:var(--bg-secondary); }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Intern<span>Hub</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="internships.html">Browse Internships</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2" id="navButtons">
+        <a href="login.html" class="btn btn-outline-accent btn-sm">Login</a>
+        <a href="register.html" class="btn btn-accent btn-sm">Sign Up</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="mb-4">
+    <h2 style="font-weight:800;font-size:1.8rem;">Browse <span style="color:var(--accent);">Internships</span></h2>
+    <p class="muted-text" style="font-size:0.9rem;">Showing <strong id="totalCount" style="color:var(--text-primary);">...</strong> internships</p>
+  </div>
+
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.5rem;">
+    <div class="d-flex gap-3 flex-wrap align-items-center">
+      <div style="position:relative;flex:1;min-width:200px;">
+        <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
+        <input type="text" class="form-control form-control-dark" id="searchInput" placeholder="Role, skill, or keyword..." style="padding-left:2.5rem;" />
+      </div>
+      <div style="position:relative;min-width:150px;max-width:200px;">
+        <i class="bi bi-geo-alt" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
+        <input type="text" class="form-control form-control-dark" id="locationInput" placeholder="Location..." style="padding-left:2.5rem;" />
+      </div>
+      <select class="sort-select" id="sortSelect">
+        <option value="">Latest First</option>
+        <option value="stipend">Stipend: High to Low</option>
+      </select>
+      <button class="btn btn-accent" onclick="loadInternships()">Search</button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="filter-sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 style="margin:0;font-size:0.95rem;">Filters</h6>
+          <button class="btn btn-sm" style="color:var(--accent);font-size:0.8rem;padding:0;" onclick="clearFilters()">Clear All</button>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:0.75rem;">Work Type</h6>
+          <label class="filter-check"><input type="checkbox" value="Remote" class="wt-filter" /> <span>Remote</span></label>
+          <label class="filter-check"><input type="checkbox" value="In-Office" class="wt-filter" /> <span>In-Office</span></label>
+          <label class="filter-check"><input type="checkbox" value="Hybrid" class="wt-filter" /> <span>Hybrid</span></label>
+        </div>
+        <hr style="border-color:var(--border);">
+        <div style="margin-bottom:1.5rem;">
+          <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:0.75rem;">Category</h6>
+          <label class="filter-check"><input type="checkbox" value="Web Development" class="cat-filter" /> <span>Web Development</span></label>
+          <label class="filter-check"><input type="checkbox" value="Data Science / ML" class="cat-filter" /> <span>Data Science / ML</span></label>
+          <label class="filter-check"><input type="checkbox" value="UI/UX Design" class="cat-filter" /> <span>UI/UX Design</span></label>
+          <label class="filter-check"><input type="checkbox" value="Marketing" class="cat-filter" /> <span>Marketing</span></label>
+          <label class="filter-check"><input type="checkbox" value="Finance" class="cat-filter" /> <span>Finance</span></label>
+        </div>
+        <hr style="border-color:var(--border);">
+        <div>
+          <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:0.75rem;">Min Stipend (₹/mo)</h6>
+          <label class="filter-check"><input type="radio" name="stipend" value="" checked /> <span>Any</span></label>
+          <label class="filter-check"><input type="radio" name="stipend" value="5000" /> <span>5,000+</span></label>
+          <label class="filter-check"><input type="radio" name="stipend" value="10000" /> <span>10,000+</span></label>
+          <label class="filter-check"><input type="radio" name="stipend" value="20000" /> <span>20,000+</span></label>
+        </div>
+        <button class="btn btn-accent w-100 mt-3 btn-sm" onclick="loadInternships()">Apply Filters</button>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      <div id="listingsGrid">
+        <div class="skeleton mb-3" style="height:120px;"></div>
+        <div class="skeleton mb-3" style="height:120px;"></div>
+        <div class="skeleton mb-3" style="height:120px;"></div>
+      </div>
+      <div class="d-flex justify-content-center mt-4" id="paginationWrap" style="display:none!important;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+  // ── State (defined FIRST before any functions use them) ──
+  let savedSet = new Set();
+  let appliedSet = new Set();
+  let appliedMap = new Map();
+  let dataFetched = false;
+  let currentPage = 1;
+
+  // ── Navbar auth update ──
+  (function updateNav() {
+    const u = Auth.getUser();
+    if (u && Auth.isLoggedIn()) {
+      const dash = u.role === 'recruiter' ? 'recruiter-dashboard.html' : 'student-dashboard.html';
+      document.getElementById('navButtons').innerHTML = `
+        <a href="${dash}" class="btn btn-accent btn-sm"><i class="bi bi-grid me-1"></i>Dashboard</a>
+        <a href="javascript:void(0)" onclick="Auth.logout()" class="btn btn-outline-accent btn-sm">Logout</a>`;
+    }
+  })();
+
+  const avatarColors = ['rgba(59,130,246,0.15):#60a5fa','rgba(234,88,12,0.15):#fb923c','rgba(124,58,237,0.15):#a78bfa','rgba(16,185,129,0.15):#10b981','rgba(236,72,153,0.15):#ec4899','rgba(20,184,166,0.15):#14b8a6'];
+
+  function getAvatarStyle(name = '') {
+    const idx = (name.charCodeAt(0) || 0) % avatarColors.length;
+    const [bg, color] = avatarColors[idx].split(':');
+    return { bg, color, letter: name.charAt(0).toUpperCase() || '?' };
+  }
+
+  function renderCard(intern) {
+    const id = String(intern._id);
+    const av = getAvatarStyle(intern.companyName);
+    const workBadge = intern.workType === 'Remote' ? 'badge-teal' : intern.workType === 'In-Office' ? 'badge-purple' : 'badge-orange';
+    const skills = (intern.skills || []).slice(0, 3).map(s => `<span class="tag">${s}</span>`).join('');
+    const stipend = intern.stipend?.amount ? `&#8377;${intern.stipend.amount.toLocaleString('en-IN')}/mo` : 'Unpaid';
+    const daysAgo = Math.floor((Date.now() - new Date(intern.createdAt)) / 86400000);
+    const timeLabel = daysAgo === 0 ? 'Today' : daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`;
+    const isSaved = savedSet.has(id);
+    const alreadyApplied = appliedSet.has(id);
+    const applicationId = appliedMap.get(id) || '';
+    const isStudent = Auth.isLoggedIn() && Auth.getUser()?.role === 'student';
+
+    let applyBtn = '';
+    if (isStudent) {
+      if (alreadyApplied) {
+        applyBtn = `<div class="mt-2 d-flex gap-2 align-items-center">
+          <button class="btn btn-sm py-1 px-3" style="font-size:0.8rem;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);color:var(--accent);" disabled>
+            <i class="bi bi-check-circle me-1"></i>Applied
+          </button>
+          <button class="btn btn-sm py-1 px-3" style="font-size:0.8rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;" onclick="withdrawApp(event,'${applicationId}','${id}')">
+            <i class="bi bi-x-circle me-1"></i>Withdraw
+          </button>
+        </div>`;
+      } else {
+        applyBtn = `<div class="mt-2">
+          <button class="btn btn-accent btn-sm py-1 px-3" style="font-size:0.8rem;" onclick="applyNow(event,'${id}')">
+            <i class="bi bi-send me-1"></i>Apply Now
+          </button>
+        </div>`;
+      }
+    }
+
+    return `<div class="internship-card" id="icard-${id}">
+      <div class="d-flex align-items-start gap-3">
+        <div class="company-avatar" style="background:${av.bg};color:${av.color};">${av.letter}</div>
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h6 style="font-weight:700;margin-bottom:2px;">${intern.title}</h6>
+              <div class="muted-text" style="font-size:0.85rem;margin-bottom:0.5rem;">${intern.companyName} &middot; ${intern.location}</div>
+            </div>
+            <button class="saved-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave(event,this,'${id}')">
+              <i class="bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}"></i>
+            </button>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="${workBadge}">${intern.workType}</span>
+            ${skills}
+          </div>
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <span class="muted-text" style="font-size:0.82rem;"><i class="bi bi-currency-rupee"></i> ${stipend}</span>
+            <span class="muted-text" style="font-size:0.82rem;"><i class="bi bi-clock"></i> ${intern.duration}</span>
+            <span class="muted-text" style="font-size:0.82rem;"><i class="bi bi-people"></i> ${intern.applicationsCount || 0} Applied</span>
+            <span class="muted-text ms-auto" style="font-size:0.78rem;">${timeLabel}</span>
+          </div>
+          ${applyBtn}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  async function loadInternships(page = 1) {
+    // Fetch user-specific data once
+    if (Auth.isLoggedIn() && Auth.getUser()?.role === 'student' && !dataFetched) {
+      dataFetched = true; // set early to avoid duplicate calls
+      const [savedRes, appliedRes] = await Promise.all([
+        AuthAPI.getSaved(),
+        ApplicationAPI.getMyApplications()
+      ]);
+      if (savedRes.success && savedRes.data) {
+        savedSet = new Set(savedRes.data.map(i => String(i._id || i)));
+      }
+      if (appliedRes.success && appliedRes.data) {
+        appliedRes.data.forEach(app => {
+          const iid = String(app.internship?._id || app.internship || '');
+          if (iid) {
+            appliedSet.add(iid);
+            appliedMap.set(iid, String(app._id));
+          }
+        });
+      }
+    }
+
+    currentPage = page;
+    const grid = document.getElementById('listingsGrid');
+    grid.innerHTML = `<div class="skeleton mb-3" style="height:120px;"></div>
+      <div class="skeleton mb-3" style="height:120px;"></div>
+      <div class="skeleton mb-3" style="height:120px;"></div>`;
+
+    const params = {
+      page, limit: 8,
+      search: document.getElementById('searchInput').value.trim(),
+      location: document.getElementById('locationInput').value.trim(),
+    };
+    const workTypes = [...document.querySelectorAll('.wt-filter:checked')].map(c => c.value);
+    const categories = [...document.querySelectorAll('.cat-filter:checked')].map(c => c.value);
+    const minStipend = document.querySelector('input[name="stipend"]:checked')?.value;
+    if (workTypes.length === 1) params.workType = workTypes[0];
+    if (categories.length === 1) params.category = categories[0];
+    if (minStipend) params.minStipend = minStipend;
+
+    const result = await InternshipAPI.getAll(params);
+
+    if (!result.success) {
+      grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:var(--text-muted);background:var(--bg-card);border:1px dashed var(--border);border-radius:12px;">
+        <i class="bi bi-wifi-off" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:#f87171;"></i>
+        <div style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">Cannot connect to backend</div>
+        <div style="font-size:0.85rem;">${result.error || 'Make sure the backend server is running on port 5000.'}</div>
+        <button class="btn btn-accent btn-sm mt-3" onclick="loadInternships()">Retry</button>
+      </div>`;
+      return;
+    }
+
+    const { data, total, totalPages } = result.data;
+    document.getElementById('totalCount').textContent = (total || 0).toLocaleString('en-IN') + '+';
+
+    if (!data || !data.length) {
+      grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:var(--text-muted);">
+        <i class="bi bi-search" style="font-size:2.5rem;display:block;margin-bottom:1rem;"></i>
+        No internships found. Try different filters.</div>`;
+      return;
+    }
+
+    grid.innerHTML = data.map(renderCard).join('');
+    renderPagination(totalPages, page);
+  }
+
+  function renderPagination(totalPages, current) {
+    const wrap = document.getElementById('paginationWrap');
+    if (!totalPages || totalPages <= 1) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    const btnStyle = active => `background:${active ? 'var(--accent)' : 'var(--bg-card)'};border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};color:${active ? '#0D1117' : 'var(--text-muted)'};border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:${active ? '700' : '400'};`;
+    let html = `<div style="display:flex;gap:0.3rem;">`;
+    for (let i = 1; i <= totalPages; i++) {
+      html += `<button style="${btnStyle(i === current)}" onclick="loadInternships(${i})">${i}</button>`;
+    }
+    html += `</div>`;
+    wrap.innerHTML = html;
+  }
+
+  async function applyNow(e, internshipId) {
+    e.stopPropagation();
+    const btn = e.target.closest('button');
+    UI.setLoading(btn, true);
+    const result = await ApplicationAPI.apply(internshipId, {});
+    UI.setLoading(btn, false);
+    if (!result.success) { UI.showToast(result.error || 'Application failed', 'error'); return; }
+    UI.showToast('Application submitted! 🎉');
+    const appId = String(result.data?.data?._id || '');
+    appliedSet.add(internshipId);
+    if (appId) appliedMap.set(internshipId, appId);
+    const card = document.getElementById(`icard-${internshipId}`);
+    if (card) {
+      const btnWrap = card.querySelector('.mt-2');
+      if (btnWrap) btnWrap.outerHTML = `<div class="mt-2 d-flex gap-2 align-items-center">
+        <button class="btn btn-sm py-1 px-3" style="font-size:0.8rem;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);color:var(--accent);" disabled>
+          <i class="bi bi-check-circle me-1"></i>Applied
+        </button>
+        <button class="btn btn-sm py-1 px-3" style="font-size:0.8rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;" onclick="withdrawApp(event,'${appId}','${internshipId}')">
+          <i class="bi bi-x-circle me-1"></i>Withdraw
+        </button>
+      </div>`;
+    }
+  }
+
+  async function withdrawApp(e, applicationId, internshipId) {
+    e.stopPropagation();
+    const btn = e.target.closest('button');
+    UI.setLoading(btn, true);
+    const result = await ApplicationAPI.withdraw(applicationId);
+    UI.setLoading(btn, false);
+    if (!result.success) { UI.showToast(result.error || 'Could not withdraw', 'error'); return; }
+    UI.showToast('Application withdrawn.', 'info');
+    appliedSet.delete(internshipId);
+    appliedMap.delete(internshipId);
+    const card = document.getElementById(`icard-${internshipId}`);
+    if (card) {
+      const btnWrap = card.querySelector('.mt-2');
+      if (btnWrap) btnWrap.outerHTML = `<div class="mt-2">
+        <button class="btn btn-accent btn-sm py-1 px-3" style="font-size:0.8rem;" onclick="applyNow(event,'${internshipId}')">
+          <i class="bi bi-send me-1"></i>Apply Now
+        </button>
+      </div>`;
+    }
+  }
+
+  async function toggleSave(e, btn, id) {
+    e.stopPropagation();
+    if (!Auth.isLoggedIn()) { window.location.href = 'login.html'; return; }
+    if (Auth.getUser()?.role !== 'student') { UI.showToast('Only students can save internships.', 'info'); return; }
+    const wasSaved = btn.classList.contains('saved');
+    btn.classList.toggle('saved');
+    btn.querySelector('i').className = !wasSaved ? 'bi bi-bookmark-fill' : 'bi bi-bookmark';
+    const res = await AuthAPI.toggleSave(id);
+    if (res.success) {
+      if (res.data?.isSaved ?? !wasSaved) savedSet.add(id); else savedSet.delete(id);
+      UI.showToast(res.data?.isSaved ?? !wasSaved ? 'Saved!' : 'Removed from saved', 'info');
+    } else {
+      btn.classList.toggle('saved');
+      btn.querySelector('i').className = wasSaved ? 'bi bi-bookmark-fill' : 'bi bi-bookmark';
+      UI.showToast(res.error || 'Failed to save', 'error');
+    }
+  }
+
+  function clearFilters() {
+    document.querySelectorAll('.wt-filter, .cat-filter').forEach(c => c.checked = false);
+    document.querySelector('input[name="stipend"]').checked = true;
+    loadInternships();
+  }
+
+  loadInternships();
+  document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') loadInternships(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InternHub — Find Your Dream Internship</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+  <style>
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 0 4rem;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,212,170,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -200px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--accent) 0%, #00a8f3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-search {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      max-width: 600px;
+    }
+
+    .hero-search input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .hero-search input::placeholder { color: var(--text-muted); }
+
+    .hero-img-wrap {
+      position: relative;
+    }
+
+    .hero-card-float {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      position: absolute;
+    }
+
+    .hero-card-float.card-1 {
+      top: 15%;
+      right: -20px;
+      animation: float1 3s ease-in-out infinite;
+    }
+
+    .hero-card-float.card-2 {
+      bottom: 20%;
+      left: -30px;
+      animation: float2 3.5s ease-in-out infinite;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(10px); }
+    }
+
+    .hero-dashboard-mockup {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+
+    .mockup-bar {
+      background: var(--bg-secondary);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #ffbd2e; }
+    .dot-g { background: #28ca41; }
+
+    .mockup-body { padding: 1.5rem; }
+
+    .mockup-intern-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border);
+    }
+
+    .mockup-logo {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.8rem;
+    }
+
+    /* Feature Section */
+    .feature-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Steps */
+    .step-number {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(0,212,170,0.1);
+      border: 1.5px solid rgba(0,212,170,0.3);
+      color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .step-connector {
+      width: 2px;
+      height: 40px;
+      background: var(--border);
+      margin: 0.3rem 0 0.3rem 21px;
+    }
+
+    /* Company logos */
+    .company-logo {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.8rem 1.5rem;
+      color: var(--text-muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    /* Testimonial */
+    .testimonial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .testimonial-card .stars { color: #f59e0b; }
+
+    .avatar-circle {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Intern<span>Hub</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="internships.html">Browse Internships</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Companies</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2" id="navAuthBtns">
+        <a href="login.html" class="btn btn-outline-accent btn-sm">Login</a>
+        <a href="register.html" class="btn btn-accent btn-sm">Sign Up Free</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6">
+        <div class="section-label fade-up">🚀 Trusted by 10,000+ Students</div>
+        <h1 class="hero-title fade-up-delay-1">
+          Land Your Dream<br>
+          <span class="highlight">Internship</span><br>
+          Faster Than Ever
+        </h1>
+        <p class="muted-text mb-4 fade-up-delay-2" style="font-size:1.05rem; line-height:1.7; max-width:480px;">
+          Connect with top companies, apply with one click, and track your applications — all from one powerful platform built for students.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="hero-search fade-up-delay-2 mb-3">
+          <i class="bi bi-search text-muted"></i>
+          <input type="text" placeholder="Search by role, skill, or company..." />
+          <a href="internships.html" class="btn btn-accent btn-sm" style="white-space:nowrap;">Find Internships</a>
+        </div>
+        <p class="muted-text fade-up-delay-3" style="font-size:0.83rem;">
+          Popular: <a href="internships.html" class="text-decoration-none" style="color:var(--accent)">Web Dev</a> · 
+          <a href="internships.html" class="text-decoration-none" style="color:var(--accent)">Data Science</a> · 
+          <a href="internships.html" class="text-decoration-none" style="color:var(--accent)">UI/UX</a> · 
+          <a href="internships.html" class="text-decoration-none" style="color:var(--accent)">Marketing</a>
+        </p>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="hero-img-wrap fade-up-delay-1">
+          <!-- Dashboard Mockup -->
+          <div class="hero-dashboard-mockup">
+            <div class="mockup-bar">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+              <span class="ms-2 text-muted" style="font-size:0.75rem;">InternHub Dashboard</span>
+            </div>
+            <div class="mockup-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">Welcome back 👋</div>
+                  <div style="font-weight:700; font-size:1rem;">Anant Rajvanshi</div>
+                </div>
+                <span class="badge-teal">3 New Matches</span>
+              </div>
+              <!-- Intern rows -->
+              <div class="mockup-intern-row">
+                <div class="mockup-logo" style="background:rgba(59,130,246,0.15); color:#60a5fa;">G</div>
+                <div class="flex-grow-1">
+                  <div style="font-weight:600; font-size:0.88rem;">Frontend Developer Intern</div>
+                  <div style="color:var(--text-muted); font-size:0.78rem;">Google · Remote · ₹25,000/mo</div>
+                </div>
+                <span class="badge-teal" style="font-size:0.7rem;">Applied</span>
+              </div>
+              <div class="mockup-intern-row">
+                <div class="mockup-logo" style="background:rgba(234,88,12,0.15); color:#fb923c;">A</div>
+                <div class="flex-grow-1">
+                  <div style="font-weight:600; font-size:0.88rem;">Data Science Intern</div>
+                  <div style="color:var(--text-muted); font-size:0.78rem;">Amazon · Bangalore · ₹30,000/mo</div>
+                </div>
+                <span class="badge-orange" style="font-size:0.7rem;">Shortlisted</span>
+              </div>
+              <div class="mockup-intern-row">
+                <div class="mockup-logo" style="background:rgba(124,58,237,0.15); color:#a78bfa;">M</div>
+                <div class="flex-grow-1">
+                  <div style="font-weight:600; font-size:0.88rem;">UI/UX Design Intern</div>
+                  <div style="color:var(--text-muted); font-size:0.78rem;">Microsoft · Hyderabad · ₹20,000/mo</div>
+                </div>
+                <span class="badge-purple" style="font-size:0.7rem;">Under Review</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Cards -->
+          <div class="hero-card-float card-1">
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:2px;">Applications Today</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent);">2,481</div>
+          </div>
+
+          <div class="hero-card-float card-2">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00D4AA,#00a8f3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#0D1117;">✓</div>
+              <div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">Offer Received!</div>
+                <div style="font-size:0.82rem; font-weight:700;">Flipkart Internship</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section style="padding:3rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="row g-3 text-center">
+      <div class="col-6 col-md-3">
+        <div class="stat-box">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Active Students</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-box">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Companies Hiring</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-box">
+          <div class="stat-number">3,200+</div>
+          <div class="stat-label">Internships Posted</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-box">
+          <div class="stat-number">89%</div>
+          <div class="stat-label">Placement Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TRUSTED BY ===== -->
+<section style="padding:3rem 0;">
+  <div class="container text-center">
+    <p class="muted-text mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; font-weight:600;">Trusted by top companies</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <div class="company-logo">Google</div>
+      <div class="company-logo">Amazon</div>
+      <div class="company-logo">Microsoft</div>
+      <div class="company-logo">Flipkart</div>
+      <div class="company-logo">Zomato</div>
+      <div class="company-logo">Infosys</div>
+      <div class="company-logo">TCS</div>
+      <div class="company-logo">Wipro</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section style="padding:5rem 0;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-label">Why InternHub</div>
+      <h2 class="section-title">Everything You Need to <span class="accent-text">Succeed</span></h2>
+      <p class="muted-text mt-2">Powerful tools for students and recruiters alike</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass p-4 h-100">
+          <div class="feature-icon-wrap" style="background:rgba(0,212,170,0.1);">
+            <i class="bi bi-search" style="color:var(--accent);"></i>
+          </div>
+          <h5 style="font-weight:700; margin-bottom:0.5rem;">Smart Search & Filter</h5>
+          <p class="muted-text" style="font-size:0.9rem;">Find internships by role, location, stipend, duration, or skills — in seconds.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass p-4 h-100">
+          <div class="feature-icon-wrap" style="background:rgba(124,58,237,0.1);">
+            <i class="bi bi-send-check" style="color:#a78bfa;"></i>
+          </div>
+          <h5 style="font-weight:700; margin-bottom:0.5rem;">One-Click Apply</h5>
+          <p class="muted-text" style="font-size:0.9rem;">Save your profile once and apply to internships with a single click. No repetitive forms.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass p-4 h-100">
+          <div class="feature-icon-wrap" style="background:rgba(251,146,60,0.1);">
+            <i class="bi bi-graph-up-arrow" style="color:#fb923c;"></i>
+          </div>
+          <h5 style="font-weight:700; margin-bottom:0.5rem;">Application Tracking</h5>
+          <p class="muted-text" style="font-size:0.9rem;">Monitor every application's status in real time — Applied, Shortlisted, Rejected, Offered.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass p-4 h-100">
+          <div class="feature-icon-wrap" style="background:rgba(16,185,129,0.1);">
+            <i class="bi bi-building" style="color:#10b981;"></i>
+          </div>
+          <h5 style="font-weight:700; margin-bottom:0.5rem;">Verified Companies</h5>
+          <p class="muted-text" style="font-size:0.9rem;">All recruiters are verified to ensure genuine and safe internship opportunities.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass p-4 h-100">
+          <div class="feature-icon-wrap" style="background:rgba(59,130,246,0.1);">
+            <i class="bi bi-person-badge" style="color:#60a5fa;"></i>
+          </div>
+          <h5 style="font-weight:700; margin-bottom:0.5rem;">Recruiter Dashboard</h5>
+          <p class="muted-text" style="font-size:0.9rem;">Recruiters can post openings, view candidates, and manage the entire hiring process.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card-glass p-4 h-100">
+          <div class="feature-icon-wrap" style="background:rgba(236,72,153,0.1);">
+            <i class="bi bi-bell" style="color:#ec4899;"></i>
+          </div>
+          <h5 style="font-weight:700; margin-bottom:0.5rem;">Smart Notifications</h5>
+          <p class="muted-text" style="font-size:0.9rem;">Get instant alerts when your application status changes or new matching internships are posted.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section style="padding:5rem 0; background:var(--bg-secondary);">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-5">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title mb-4">Get Hired in <span class="accent-text">3 Simple Steps</span></h2>
+
+        <div class="d-flex align-items-start gap-3 mb-2">
+          <div>
+            <div class="step-number">1</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="pt-1">
+            <h6 style="font-weight:700;">Create Your Profile</h6>
+            <p class="muted-text" style="font-size:0.88rem;">Sign up, add your skills, education, resume, and preferences.</p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 mb-2">
+          <div>
+            <div class="step-number">2</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="pt-1">
+            <h6 style="font-weight:700;">Discover & Apply</h6>
+            <p class="muted-text" style="font-size:0.88rem;">Browse thousands of internships and apply with a single click.</p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3">
+          <div>
+            <div class="step-number">3</div>
+          </div>
+          <div class="pt-1">
+            <h6 style="font-weight:700;">Track & Get Hired</h6>
+            <p class="muted-text" style="font-size:0.88rem;">Monitor your applications and receive offers directly on the platform.</p>
+          </div>
+        </div>
+
+        <a href="register.html" class="btn btn-accent mt-4">Get Started — It's Free</a>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="card-glass p-4 text-center">
+              <i class="bi bi-person-circle mb-2" style="font-size:2rem; color:var(--accent);"></i>
+              <div style="font-weight:700; font-size:0.9rem;">Build Profile</div>
+              <div class="muted-text" style="font-size:0.8rem; margin-top:4px;">Skills & Resume</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card-glass p-4 text-center" style="margin-top:2rem;">
+              <i class="bi bi-funnel mb-2" style="font-size:2rem; color:#a78bfa;"></i>
+              <div style="font-weight:700; font-size:0.9rem;">Filter & Browse</div>
+              <div class="muted-text" style="font-size:0.8rem; margin-top:4px;">Find Best Matches</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card-glass p-4 text-center" style="margin-top:-1rem;">
+              <i class="bi bi-cursor-fill mb-2" style="font-size:2rem; color:#fb923c;"></i>
+              <div style="font-weight:700; font-size:0.9rem;">One-Click Apply</div>
+              <div class="muted-text" style="font-size:0.8rem; margin-top:4px;">Instant Apply</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card-glass p-4 text-center">
+              <i class="bi bi-trophy mb-2" style="font-size:2rem; color:#10b981;"></i>
+              <div style="font-weight:700; font-size:0.9rem;">Get Placed</div>
+              <div class="muted-text" style="font-size:0.8rem; margin-top:4px;">Land the Offer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section style="padding:5rem 0;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-label">Student Stories</div>
+      <h2 class="section-title">What Students Say <span class="accent-text">About Us</span></h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars mb-2">★★★★★</div>
+          <p style="font-size:0.9rem; line-height:1.7; margin-bottom:1rem;">"Found my dream internship at Google within a week! The search filters are amazing and the one-click apply saved so much time."</p>
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar-circle" style="background:rgba(0,212,170,0.15); color:var(--accent);">R</div>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem;">Rahul Sharma</div>
+              <div class="muted-text" style="font-size:0.78rem;">B.Tech CSE · Delhi University</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars mb-2">★★★★★</div>
+          <p style="font-size:0.9rem; line-height:1.7; margin-bottom:1rem;">"The application tracker is a game changer. I could see exactly where I stood with each company. Got placed at Amazon!"</p>
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar-circle" style="background:rgba(124,58,237,0.15); color:#a78bfa;">P</div>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem;">Priya Gupta</div>
+              <div class="muted-text" style="font-size:0.78rem;">MCA · Pune University</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars mb-2">★★★★☆</div>
+          <p style="font-size:0.9rem; line-height:1.7; margin-bottom:1rem;">"As a recruiter, managing hundreds of applications used to be a nightmare. InternHub made it effortless and organized."</p>
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar-circle" style="background:rgba(251,146,60,0.15); color:#fb923c;">A</div>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem;">Arjun Mehta</div>
+              <div class="muted-text" style="font-size:0.78rem;">HR Manager · TechCorp India</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section style="padding:5rem 0; background:var(--bg-secondary);">
+  <div class="container text-center">
+    <div class="section-label">Ready to Start?</div>
+    <h2 class="section-title mb-3">Your Internship Journey Starts <span class="accent-text">Today</span></h2>
+    <p class="muted-text mb-4" style="max-width:500px; margin:0 auto 1.5rem;">Join thousands of students who have already found amazing internships through InternHub.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="register.html" class="btn btn-accent btn-lg">Create Student Account</a>
+      <a href="register.html?role=recruiter" class="btn btn-outline-accent btn-lg">Post Internship as Recruiter</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <h4 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:var(--accent); margin-bottom:1rem;">InternHub</h4>
+        <p style="font-size:0.88rem; line-height:1.7;">Bridging the gap between students and recruiters with a smart, centralized internship platform.</p>
+      </div>
+      <div class="col-md-2 col-6">
+        <h5>Students</h5>
+        <a href="internships.html">Browse Internships</a>
+        <a href="register.html">Create Profile</a>
+        <a href="student-dashboard.html">Dashboard</a>
+      </div>
+      <div class="col-md-2 col-6">
+        <h5>Recruiters</h5>
+        <a href="post-internship.html">Post Internship</a>
+        <a href="recruiter-dashboard.html">Dashboard</a>
+        <a href="register.html?role=recruiter">Sign Up</a>
+      </div>
+      <div class="col-md-2 col-6">
+        <h5>Company</h5>
+        <a href="#">About Us</a>
+        <a href="#">Contact</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="col-md-2 col-6">
+        <h5>Legal</h5>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+    <hr style="border-color:var(--border);">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <p class="mb-0" style="font-size:0.82rem;">© 2026 InternHub. Built by Anant Rajvanshi.</p>
+      <div class="d-flex gap-3">
+        <a href="#" style="color:var(--text-muted);"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" style="color:var(--text-muted);"><i class="bi bi-linkedin"></i></a>
+        <a href="#" style="color:var(--text-muted);"><i class="bi bi-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+  // Show Dashboard button if already logged in
+  const _u = Auth.getUser();
+  if (_u && Auth.isLoggedIn()) {
+    const dash = _u.role === 'recruiter' ? 'recruiter-dashboard.html' : 'student-dashboard.html';
+    document.getElementById('navAuthBtns').innerHTML = `
+      <a href="${dash}" class="btn btn-accent btn-sm"><i class="bi bi-grid me-1"></i>Dashboard</a>
+      <a href="javascript:void(0)" onclick="Auth.logout()" class="btn btn-outline-accent btn-sm">Logout</a>`;
+  }
+</script>
+</body>
+</html>

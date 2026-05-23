@@ -203,69 +203,82 @@
   }
 
   async function loadInternships(page = 1) {
-    // Fetch user-specific data once
-    if (Auth.isLoggedIn() && Auth.getUser()?.role === 'student' && !dataFetched) {
-      dataFetched = true; // set early to avoid duplicate calls
-      const [savedRes, appliedRes] = await Promise.all([
-        AuthAPI.getSaved(),
-        ApplicationAPI.getMyApplications()
-      ]);
-      if (savedRes.success && savedRes.data) {
-        savedSet = new Set(savedRes.data.map(i => String(i._id || i)));
+    try {
+      // Fetch user-specific data once
+      if (Auth.isLoggedIn() && Auth.getUser()?.role === 'student' && !dataFetched) {
+        dataFetched = true; // set early to avoid duplicate calls
+        const [savedRes, appliedRes] = await Promise.all([
+          AuthAPI.getSaved(),
+          ApplicationAPI.getMyApplications()
+        ]);
+        if (savedRes.success && savedRes.data) {
+          const arr = Array.isArray(savedRes.data) ? savedRes.data : (savedRes.data.data || []);
+          savedSet = new Set(arr.map(i => String(i._id || i)));
+        }
+        if (appliedRes.success && appliedRes.data) {
+          const arr = Array.isArray(appliedRes.data) ? appliedRes.data : (appliedRes.data.data || []);
+          arr.forEach(app => {
+            const iid = String(app.internship?._id || app.internship || '');
+            if (iid) {
+              appliedSet.add(iid);
+              appliedMap.set(iid, String(app._id));
+            }
+          });
+        }
       }
-      if (appliedRes.success && appliedRes.data) {
-        appliedRes.data.forEach(app => {
-          const iid = String(app.internship?._id || app.internship || '');
-          if (iid) {
-            appliedSet.add(iid);
-            appliedMap.set(iid, String(app._id));
-          }
-        });
+
+      currentPage = page;
+      const grid = document.getElementById('listingsGrid');
+      grid.innerHTML = `<div class="skeleton mb-3" style="height:120px;"></div>
+        <div class="skeleton mb-3" style="height:120px;"></div>
+        <div class="skeleton mb-3" style="height:120px;"></div>`;
+
+      const params = {
+        page, limit: 8,
+        search: document.getElementById('searchInput').value.trim(),
+        location: document.getElementById('locationInput').value.trim(),
+      };
+      const workTypes = [...document.querySelectorAll('.wt-filter:checked')].map(c => c.value);
+      const categories = [...document.querySelectorAll('.cat-filter:checked')].map(c => c.value);
+      const minStipend = document.querySelector('input[name="stipend"]:checked')?.value;
+      if (workTypes.length === 1) params.workType = workTypes[0];
+      if (categories.length === 1) params.category = categories[0];
+      if (minStipend) params.minStipend = minStipend;
+
+      const result = await InternshipAPI.getAll(params);
+
+      if (!result.success) {
+        grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:var(--text-muted);background:var(--bg-card);border:1px dashed var(--border);border-radius:12px;">
+          <i class="bi bi-wifi-off" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:#f87171;"></i>
+          <div style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">Cannot connect to backend</div>
+          <div style="font-size:0.85rem;">${result.error || 'Make sure the backend server is running on port 5000.'}</div>
+          <button class="btn btn-accent btn-sm mt-3" onclick="loadInternships()">Retry</button>
+        </div>`;
+        return;
       }
-    }
 
-    currentPage = page;
-    const grid = document.getElementById('listingsGrid');
-    grid.innerHTML = `<div class="skeleton mb-3" style="height:120px;"></div>
-      <div class="skeleton mb-3" style="height:120px;"></div>
-      <div class="skeleton mb-3" style="height:120px;"></div>`;
+      const { data, total, totalPages } = result.data;
+      document.getElementById('totalCount').textContent = (total || 0).toLocaleString('en-IN') + '+';
 
-    const params = {
-      page, limit: 8,
-      search: document.getElementById('searchInput').value.trim(),
-      location: document.getElementById('locationInput').value.trim(),
-    };
-    const workTypes = [...document.querySelectorAll('.wt-filter:checked')].map(c => c.value);
-    const categories = [...document.querySelectorAll('.cat-filter:checked')].map(c => c.value);
-    const minStipend = document.querySelector('input[name="stipend"]:checked')?.value;
-    if (workTypes.length === 1) params.workType = workTypes[0];
-    if (categories.length === 1) params.category = categories[0];
-    if (minStipend) params.minStipend = minStipend;
+      if (!data || !data.length) {
+        grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:var(--text-muted);">
+          <i class="bi bi-search" style="font-size:2.5rem;display:block;margin-bottom:1rem;"></i>
+          No internships found. Try different filters.</div>`;
+        return;
+      }
 
-    const result = await InternshipAPI.getAll(params);
-
-    if (!result.success) {
-      grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:var(--text-muted);background:var(--bg-card);border:1px dashed var(--border);border-radius:12px;">
-        <i class="bi bi-wifi-off" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:#f87171;"></i>
-        <div style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">Cannot connect to backend</div>
-        <div style="font-size:0.85rem;">${result.error || 'Make sure the backend server is running on port 5000.'}</div>
+      grid.innerHTML = data.map(renderCard).join('');
+      renderPagination(totalPages, page);
+    } catch (err) {
+      console.error("Error loading internships:", err);
+      const grid = document.getElementById('listingsGrid');
+      grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:#f87171;background:var(--bg-card);border:1px dashed var(--border);border-radius:12px;">
+        <i class="bi bi-exclamation-triangle" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:#f87171;"></i>
+        <div style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">An error occurred while loading internships</div>
+        <div style="font-size:0.85rem;">${err.message}</div>
         <button class="btn btn-accent btn-sm mt-3" onclick="loadInternships()">Retry</button>
       </div>`;
-      return;
     }
-
-    const { data, total, totalPages } = result.data;
-    document.getElementById('totalCount').textContent = (total || 0).toLocaleString('en-IN') + '+';
-
-    if (!data || !data.length) {
-      grid.innerHTML = `<div style="text-align:center;padding:3rem 0;color:var(--text-muted);">
-        <i class="bi bi-search" style="font-size:2.5rem;display:block;margin-bottom:1rem;"></i>
-        No internships found. Try different filters.</div>`;
-      return;
-    }
-
-    grid.innerHTML = data.map(renderCard).join('');
-    renderPagination(totalPages, page);
   }
 
   function renderPagination(totalPages, current) {

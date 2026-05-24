@@ -221,6 +221,13 @@
     if (!firstName || !lastName || !email || !password) {
       banner.textContent = 'Please fill in all fields.'; banner.style.display = 'block'; return;
     }
+    const nameRegex = /^[A-Za-z\s-]+$/;
+    if (!nameRegex.test(firstName)) {
+      banner.textContent = 'First name must contain only alphabetic characters.'; banner.style.display = 'block'; return;
+    }
+    if (!nameRegex.test(lastName)) {
+      banner.textContent = 'Last name must contain only alphabetic characters.'; banner.style.display = 'block'; return;
+    }
     if (password.length < 6) {
       banner.textContent = 'Password must be at least 6 characters.'; banner.style.display = 'block'; return;
     }

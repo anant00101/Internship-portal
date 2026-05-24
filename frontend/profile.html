@@ -238,6 +238,17 @@
       err.style.display = 'block';
       return;
     }
+    const nameRegex = /^[A-Za-z\s-]+$/;
+    if (!nameRegex.test(payload.firstName)) {
+      err.textContent = 'First name must contain only alphabetic characters.';
+      err.style.display = 'block';
+      return;
+    }
+    if (!nameRegex.test(payload.lastName)) {
+      err.textContent = 'Last name must contain only alphabetic characters.';
+      err.style.display = 'block';
+      return;
+    }
 
     UI.setLoading(btn, true);
     const res = await AuthAPI.updateProfile(payload);

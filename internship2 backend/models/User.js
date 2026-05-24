@@ -7,11 +7,23 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, 'First name is required'],
       trim: true,
+      validate: {
+        validator: function(v) {
+          return /^[A-Za-z\s-]+$/.test(v);
+        },
+        message: 'First name must contain only alphabetic characters.'
+      }
     },
     lastName: {
       type: String,
       required: [true, 'Last name is required'],
       trim: true,
+      validate: {
+        validator: function(v) {
+          return /^[A-Za-z\s-]+$/.test(v);
+        },
+        message: 'Last name must contain only alphabetic characters.'
+      }
     },
     email: {
       type: String,
